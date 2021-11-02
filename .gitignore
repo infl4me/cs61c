@@ -1,4 +1,1 @@
-# Ignore all files without an extension
-*
-!*/
-!*.*
+*.out
