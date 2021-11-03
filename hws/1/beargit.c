@@ -36,18 +36,17 @@
  * Output (to stdout):
  * - None if successful
  */
-
-int beargit_init(void) {
+int beargit_init(void)
+{
   fs_mkdir(".beargit");
 
-  FILE* findex = fopen(".beargit/.index", "w");
+  FILE *findex = fopen(".beargit/.index", "w");
   fclose(findex);
-  
+
   write_string_to_file(".beargit/.prev", "0000000000000000000000000000000000000000");
 
   return 0;
 }
-
 
 /* beargit add <filename>
  * 
@@ -59,15 +58,17 @@ int beargit_init(void) {
  * Output (to stdout):
  * - None if successful
  */
-
-int beargit_add(const char* filename) {
-  FILE* findex = fopen(".beargit/.index", "r");
+int beargit_add(const char *filename)
+{
+  FILE *findex = fopen(".beargit/.index", "r");
   FILE *fnewindex = fopen(".beargit/.newindex", "w");
 
   char line[FILENAME_SIZE];
-  while(fgets(line, sizeof(line), findex)) {
+  while (fgets(line, sizeof(line), findex))
+  {
     strtok(line, "\n");
-    if (strcmp(line, filename) == 0) {
+    if (strcmp(line, filename) == 0)
+    {
       fprintf(stderr, "ERROR: File %s already added\n", filename);
       fclose(findex);
       fclose(fnewindex);
@@ -87,14 +88,14 @@ int beargit_add(const char* filename) {
   return 0;
 }
 
-
 /* beargit rm <filename>
  * 
  * See "Step 2" in the homework 1 spec.
  *
  */
 
-int beargit_rm(const char* filename) {
+int beargit_rm(const char *filename)
+{
   /* COMPLETE THE REST */
 
   return 0;
@@ -106,19 +107,23 @@ int beargit_rm(const char* filename) {
  *
  */
 
-const char* go_bears = "GO BEARS!";
+const char *go_bears = "GO BEARS!";
 
-int is_commit_msg_ok(const char* msg) {
+int is_commit_msg_ok(const char *msg)
+{
   /* COMPLETE THE REST */
   return 0;
 }
 
-void next_commit_id(char* commit_id) {
+void next_commit_id(char *commit_id)
+{
   /* COMPLETE THE REST */
 }
 
-int beargit_commit(const char* msg) {
-  if (!is_commit_msg_ok(msg)) {
+int beargit_commit(const char *msg)
+{
+  if (!is_commit_msg_ok(msg))
+  {
     fprintf(stderr, "ERROR: Message must contain \"%s\"\n", go_bears);
     return 1;
   }
@@ -138,7 +143,8 @@ int beargit_commit(const char* msg) {
  *
  */
 
-int beargit_status() {
+int beargit_status()
+{
   /* COMPLETE THE REST */
 
   return 0;
@@ -150,7 +156,8 @@ int beargit_status() {
  *
  */
 
-int beargit_log() {
+int beargit_log()
+{
   /* COMPLETE THE REST */
 
   return 0;
