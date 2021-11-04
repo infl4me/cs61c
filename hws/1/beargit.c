@@ -268,7 +268,7 @@ int beargit_log()
 
   if (commit_id[0] == '0')
   {
-    fprintf(stderr, "ERROR: There are no commits!\n", go_bears);
+    fprintf(stderr, "ERROR: There are no commits!\n");
     return 1;
   }
 
