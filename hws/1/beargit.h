@@ -13,3 +13,4 @@ int beargit_log();
 #define COMMIT_ID_SIZE (COMMIT_ID_BYTES+1)
 #define MSG_SIZE 512
 #define INDEX_PATH ".beargit/.index"
+#define PREV_PATH ".beargit/.prev"

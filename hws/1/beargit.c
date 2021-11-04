@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include <unistd.h>
 #include <sys/stat.h>
@@ -139,13 +140,39 @@ const char *go_bears = "GO BEARS!";
 
 int is_commit_msg_ok(const char *msg)
 {
-  /* COMPLETE THE REST */
+  int i = 0;
+
+  while (go_bears[i] == msg[i])
+  {
+    if (go_bears[i] == '\0' && msg[i] == '\0')
+    {
+      return 1;
+    }
+
+    i++;
+  }
+
   return 0;
 }
 
+int random_int(int min, int max)
+{
+  return min + rand() % (max + 1 - min);
+}
+char id_symbols[] = "61c";
 void next_commit_id(char *commit_id)
 {
-  /* COMPLETE THE REST */
+  int i = 0;
+
+  srand(time(NULL));
+
+  while (i <= COMMIT_ID_BYTES)
+  {
+    commit_id[i] = id_symbols[random_int(0, 2)];
+    i++;
+  }
+
+  commit_id[++i] = '\0';
 }
 
 int beargit_commit(const char *msg)
@@ -157,10 +184,45 @@ int beargit_commit(const char *msg)
   }
 
   char commit_id[COMMIT_ID_SIZE];
-  read_string_from_file(".beargit/.prev", commit_id, COMMIT_ID_SIZE);
+  read_string_from_file(PREV_PATH, commit_id, COMMIT_ID_SIZE);
   next_commit_id(commit_id);
 
-  /* COMPLETE THE REST */
+  char path[250];
+  strcpy(path, ".beargit/");
+  strcat(path, commit_id);
+  fs_mkdir(path); // create .beargit/<commit_id> dir
+
+  strcpy(path, ".beargit/");
+  strcat(path, commit_id);
+  strcat(path, "/.index");
+  fs_cp(INDEX_PATH, path); // copy .beargit/.index into .beargit/<commit_id>
+
+  strcpy(path, ".beargit/");
+  strcat(path, commit_id);
+  strcat(path, "/.prev");
+  fs_cp(PREV_PATH, path); // copy .beargit/.prev into .beargit/<commit_id>
+
+  FILE *fp = fopen(INDEX_PATH, "r");
+  char line[FILENAME_SIZE];
+  while (fgets(line, FILENAME_SIZE, fp) != NULL)
+  {
+    strtok(line, "\n");
+
+    strcpy(path, ".beargit/");
+    strcat(path, commit_id);
+    strcat(path, "/");
+    strcat(path, line);
+    fs_cp(line, path); // copying tracked files into .beargit/<commit_id>
+  }
+
+  fclose(fp);
+
+  strcpy(path, ".beargit/");
+  strcat(path, commit_id);
+  strcat(path, "/.msg");
+  write_string_to_file(path, msg);
+
+  write_string_to_file(PREV_PATH, commit_id);
 
   return 0;
 }
