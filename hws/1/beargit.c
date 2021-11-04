@@ -166,13 +166,13 @@ void next_commit_id(char *commit_id)
 
   srand(time(NULL));
 
-  while (i <= COMMIT_ID_BYTES)
+  while (i < COMMIT_ID_BYTES)
   {
     commit_id[i] = id_symbols[random_int(0, 2)];
     i++;
   }
 
-  commit_id[++i] = '\0';
+  commit_id[COMMIT_ID_BYTES] = '\0';
 }
 
 int beargit_commit(const char *msg)
@@ -262,7 +262,32 @@ int beargit_status()
  */
 int beargit_log()
 {
-  /* COMPLETE THE REST */
+  char commit_msg[100];
+  char commit_id[COMMIT_ID_SIZE];
+  read_string_from_file(PREV_PATH, commit_id, COMMIT_ID_SIZE);
+
+  if (commit_id[0] == '0')
+  {
+    fprintf(stderr, "ERROR: There are no commits!\n", go_bears);
+    return 1;
+  }
+
+  char path[250];
+  while (commit_id[0] != '0')
+  {
+    strcpy(path, ".beargit/");
+    strcat(path, commit_id);
+    strcat(path, "/.msg");
+    read_string_from_file(path, commit_msg, 100);
+
+    printf("\ncommit %s\n", commit_id);
+    printf("    %s\n", commit_msg);
+
+    strcpy(path, ".beargit/");
+    strcat(path, commit_id);
+    strcat(path, "/.prev");
+    read_string_from_file(path, commit_id, COMMIT_ID_SIZE);
+  }
 
   return 0;
 }
