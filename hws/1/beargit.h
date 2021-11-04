@@ -12,3 +12,5 @@ int beargit_log();
 #define FILENAME_SIZE 512
 #define COMMIT_ID_SIZE (COMMIT_ID_BYTES+1)
 #define MSG_SIZE 512
+#define LINE_SIZE 100
+#define INDEX_PATH ".beargit/.index"

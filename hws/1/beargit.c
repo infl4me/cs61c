@@ -93,7 +93,6 @@ int beargit_add(const char *filename)
  * See "Step 2" in the homework 1 spec.
  *
  */
-
 int beargit_rm(const char *filename)
 {
   /* COMPLETE THE REST */
@@ -106,7 +105,6 @@ int beargit_rm(const char *filename)
  * See "Step 3" in the homework 1 spec.
  *
  */
-
 const char *go_bears = "GO BEARS!";
 
 int is_commit_msg_ok(const char *msg)
@@ -142,10 +140,25 @@ int beargit_commit(const char *msg)
  * See "Step 1" in the homework 1 spec.
  *
  */
-
 int beargit_status()
 {
-  /* COMPLETE THE REST */
+  FILE *fp;
+  char line[LINE_SIZE];
+  int line_count = 0;
+
+  fp = fopen(INDEX_PATH, "r");
+
+  printf("Tracked files:\n\n");
+
+  while (fgets(line, LINE_SIZE, fp) != NULL)
+  {
+    printf("  %s", line);
+    line_count++;
+  }
+
+  printf("\n%d files total\n", line_count);
+
+  fclose(fp);
 
   return 0;
 }
@@ -155,7 +168,6 @@ int beargit_status()
  * See "Step 4" in the homework 1 spec.
  *
  */
-
 int beargit_log()
 {
   /* COMPLETE THE REST */
