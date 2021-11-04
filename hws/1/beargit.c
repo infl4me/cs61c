@@ -95,7 +95,37 @@ int beargit_add(const char *filename)
  */
 int beargit_rm(const char *filename)
 {
-  /* COMPLETE THE REST */
+  FILE *findex = fopen(".beargit/.index", "r");
+  FILE *fnewindex = fopen(".beargit/.newindex", "w");
+  int found = 0;
+
+  char line[FILENAME_SIZE];
+  while (fgets(line, sizeof(line), findex))
+  {
+    strtok(line, "\n");
+    if (strcmp(line, filename) == 0)
+    {
+      found = 1;
+    }
+    else
+    {
+      fprintf(fnewindex, "%s\n", line);
+    }
+  }
+
+  if (!found)
+  {
+    fprintf(stderr, "ERROR: File %s not tracked\n", filename);
+    fclose(findex);
+    fclose(fnewindex);
+    fs_rm(".beargit/.newindex");
+    return 1;
+  }
+
+  fclose(findex);
+  fclose(fnewindex);
+
+  fs_mv(".beargit/.newindex", ".beargit/.index");
 
   return 0;
 }
@@ -143,14 +173,14 @@ int beargit_commit(const char *msg)
 int beargit_status()
 {
   FILE *fp;
-  char line[LINE_SIZE];
+  char line[FILENAME_SIZE];
   int line_count = 0;
 
   fp = fopen(INDEX_PATH, "r");
 
   printf("Tracked files:\n\n");
 
-  while (fgets(line, LINE_SIZE, fp) != NULL)
+  while (fgets(line, FILENAME_SIZE, fp) != NULL)
   {
     printf("  %s", line);
     line_count++;
