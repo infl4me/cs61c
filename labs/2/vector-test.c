@@ -3,15 +3,16 @@
 
 #include "vector.h"
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 	vector_t *v;
-	
+
 	printf("Calling vector_new()\n");
 	v = vector_new();
-	
+
 	printf("Calling vector_delete()\n");
 	vector_delete(v);
-	
+
 	printf("vector_new() again\n");
 	v = vector_new();
 
@@ -25,7 +26,7 @@ int main(int argc, char **argv) {
 	vector_set(v, 11, 15);
 	vector_set(v, 15, -23);
 	vector_set(v, 24, 65);
-    vector_set(v, 500, 3);
+	vector_set(v, 500, 3);
 	vector_set(v, 12, -123);
 	vector_set(v, 15, 21);
 	vector_set(v, 25, 43);
@@ -37,14 +38,14 @@ int main(int argc, char **argv) {
 	printf("-123 = %d\n", vector_get(v, 12));
 	printf("21 = %d\n", vector_get(v, 15));
 	printf("43 = %d\n", vector_get(v, 25));
-    printf("0 = %d\n", vector_get(v, 23));
-    printf("0 = %d\n", vector_get(v, 1));
-    printf("0 = %d\n", vector_get(v, 501));
-    printf("3 = %d\n", vector_get(v, 500));
+	printf("0 = %d\n", vector_get(v, 23));
+	printf("0 = %d\n", vector_get(v, 1));
+	printf("0 = %d\n", vector_get(v, 501));
+	printf("3 = %d\n", vector_get(v, 500));
 
-    vector_delete(v);
+	vector_delete(v);
 
 	printf("Test complete.\n");
-	
+
 	return 0;
 }
