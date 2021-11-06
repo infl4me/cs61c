@@ -3,15 +3,41 @@
 #include <stdlib.h>
 #include <string.h>
 
-void lfsr_calculate(uint16_t *reg) {
-
-  /* YOUR CODE HERE */
-
+// Return the nth bit of x.
+// Assume 0 <= n <= 31
+unsigned get_bit(unsigned x,
+                 unsigned n)
+{
+  return (x & (1 << n)) != 0;
+}
+// Set the nth bit of the value of x to v.
+// Assume 0 <= n <= 31, and v is 0 or 1
+void set_bit(unsigned *x,
+             unsigned n,
+             unsigned v)
+{
+  if (v)
+  {
+    *x = *x | (1 << n);
+  }
+  else
+  {
+    *x = *x & (~(1 << n));
+  }
 }
 
-int main() {
-  int8_t *numbers = (int8_t*) malloc(sizeof(int8_t) * 65535);
-  if (numbers == NULL) {
+void lfsr_calculate(uint16_t *reg)
+{
+  int lb = get_bit(*reg, 5) ^ (get_bit(*reg, 3) ^ (get_bit(*reg, 2) ^ get_bit(*reg, 0)));
+  *reg >>= 1;
+  set_bit(reg, 15, lb);
+}
+
+int main()
+{
+  int8_t *numbers = (int8_t *)malloc(sizeof(int8_t) * 65535);
+  if (numbers == NULL)
+  {
     printf("Memory allocation failed!");
     exit(1);
   }
@@ -21,12 +47,16 @@ int main() {
   uint32_t count = 0;
   int i;
 
-  do {
+  do
+  {
     count++;
     numbers[reg] = 1;
-    if (count < 24) {
+    if (count < 24)
+    {
       printf("My number is: %u\n", reg);
-    } else if (count == 24) {
+    }
+    else if (count == 24)
+    {
       printf(" ... etc etc ... \n");
     }
     for (i = 0; i < 32; i++)
@@ -35,9 +65,12 @@ int main() {
 
   printf("Got %u numbers before cycling!\n", count);
 
-  if (count == 65535) {
+  if (count == 65535)
+  {
     printf("Congratulations! It works!\n");
-  } else {
+  }
+  else
+  {
     printf("Did I miss something?\n");
   }
 
