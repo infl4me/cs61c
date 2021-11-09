@@ -34,6 +34,36 @@ int clean_suite(void)
    return 0;
 }
 
+int are_files_equal(char *filename1, char *filename2)
+{
+   FILE *fp1, *fp2;
+   int line_size = 512;
+   char line1[line_size], line2[line_size], *lp1, *lp2;
+
+   fp1 = fopen(filename1, "r");
+   fp2 = fopen(filename2, "r");
+
+   while (line1 != NULL && line2 != NULL)
+   {
+      lp1 = fgets(line1, line_size, fp1);
+      lp2 = fgets(line2, line_size, fp2);
+
+      if (lp1 == NULL && lp2 == NULL)
+      {
+         return 1;
+      }
+      else if (strcmp(line1, line2))
+      {
+         return 0;
+      }
+   }
+
+   fclose(fp1);
+   fclose(fp2);
+
+   return 0;
+}
+
 /* Simple test of fread().
  * Reads the data previously written by testFPRINTF()
  * and checks whether the expected characters are present.
@@ -81,6 +111,24 @@ void run_commit(struct commit **commit_list, const char *msg)
    new_commit->next = *commit_list;
    strcpy(new_commit->msg, msg);
    *commit_list = new_commit;
+}
+
+void status_test(void)
+{
+   int retval;
+   beargit_init();
+
+   FILE *fp1 = fopen("test1", "w");
+   FILE *fp2 = fopen("test2", "w");
+
+   fclose(fp1);
+   fclose(fp2);
+
+   beargit_add("test1");
+   beargit_add("test2");
+
+   CU_ASSERT(beargit_status() == 0);
+   CU_ASSERT(are_files_equal("../__fixtures__/status", "TEST_STDOUT") == 1);
 }
 
 void simple_log_test(void)
@@ -149,6 +197,7 @@ int cunittester()
 {
    CU_pSuite pSuite = NULL;
    CU_pSuite pSuite2 = NULL;
+   CU_pSuite pSuite3 = NULL;
 
    /* initialize the CUnit test registry */
    if (CUE_SUCCESS != CU_initialize_registry())
@@ -178,6 +227,20 @@ int cunittester()
 
    /* Add tests to the Suite #2 */
    if (NULL == CU_add_test(pSuite2, "Log output test", simple_log_test))
+   {
+      CU_cleanup_registry();
+      return CU_get_error();
+   }
+
+   pSuite3 = CU_add_suite("Suite_3", init_suite, clean_suite);
+   if (NULL == pSuite3)
+   {
+      CU_cleanup_registry();
+      return CU_get_error();
+   }
+
+   /* Add tests to the Suite #3 */
+   if (NULL == CU_add_test(pSuite3, "Status output test", status_test))
    {
       CU_cleanup_registry();
       return CU_get_error();

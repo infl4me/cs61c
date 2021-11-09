@@ -136,25 +136,26 @@ int beargit_rm(const char *filename)
   return 0;
 }
 
+const char *go_bears = "GO BEARS!";
 /* beargit commit -m <msg>
  *
  * See "Step 3" in the homework 1 spec.
  *
  */
-const char *go_bears = "GO BEARS!";
-
 int is_commit_msg_ok(const char *msg)
 {
-  int i = 0;
+  int i, j;
 
-  while (go_bears[i] == msg[i])
+  for (i = 0; msg[i] != '\0'; i++)
   {
-    if (go_bears[i] == '\0' && msg[i] == '\0')
+    for (j = 0; go_bears[j] && go_bears[j] == msg[i + j]; j++)
+    {
+    }
+
+    if (go_bears[j] == '\0' || j == strlen(go_bears) - 1)
     {
       return 1;
     }
-
-    i++;
   }
 
   return 0;
@@ -167,7 +168,13 @@ int random_int(int min, int max)
 char id_symbols[] = "61c";
 void next_commit_id_hw1(char *commit_id)
 {
-  srand(time(NULL));
+  int i, acc = 0;
+  for (i = 0; commit_id[i] != '\0'; i++)
+  {
+    acc += commit_id[i];
+  }
+
+  srand(time(NULL) + acc);
 
   while (*commit_id)
   {
@@ -289,6 +296,8 @@ int beargit_log()
     strcat(path, "/.prev");
     read_string_from_file(path, commit_id, COMMIT_ID_SIZE);
   }
+
+  printf("\n");
 
   return 0;
 }
