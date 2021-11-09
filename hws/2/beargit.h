@@ -24,3 +24,5 @@ void next_commit_id(char* commit_id);
 
 #define INDEX_PATH ".beargit/.index"
 #define PREV_PATH ".beargit/.prev"
+#define BRANCHES_PATH ".beargit/.branches"
+#define CURRENT_BRANCH_PATH ".beargit/.current_branch"

@@ -24,6 +24,9 @@ if [[ ! "$PATH" =~ "$PWD" ]]; then
 fi
 
 cd test
+echo 1 > test1
+echo 2 > test2
+echo 3 > test3
 echo
 echo  '*** WELCOME TO YOUR BEARGIT TEST DIRECTORY ***'
 echo
