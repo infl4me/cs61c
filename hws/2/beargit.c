@@ -41,14 +41,14 @@ int beargit_init(void)
 {
   fs_mkdir(".beargit");
 
-  FILE *findex = fopen(".beargit/.index", "w");
+  FILE *findex = fopen(INDEX_PATH, "w");
   fclose(findex);
 
-  FILE *fbranches = fopen(".beargit/.branches", "w");
+  FILE *fbranches = fopen(BRANCHES_PATH, "w");
   fprintf(fbranches, "%s\n", "master");
   fclose(fbranches);
 
-  write_string_to_file(".beargit/.prev", "0000000000000000000000000000000000000000");
+  write_string_to_file(PREV_PATH, "0000000000000000000000000000000000000000");
   write_string_to_file(CURRENT_BRANCH_PATH, "master");
 
   return 0;
@@ -66,7 +66,7 @@ int beargit_init(void)
  */
 int beargit_add(const char *filename)
 {
-  FILE *findex = fopen(".beargit/.index", "r");
+  FILE *findex = fopen(INDEX_PATH, "r");
   FILE *fnewindex = fopen(".beargit/.newindex", "w");
 
   char line[FILENAME_SIZE];
@@ -89,7 +89,7 @@ int beargit_add(const char *filename)
   fclose(findex);
   fclose(fnewindex);
 
-  fs_mv(".beargit/.newindex", ".beargit/.index");
+  fs_mv(".beargit/.newindex", INDEX_PATH);
 
   return 0;
 }
@@ -101,7 +101,7 @@ int beargit_add(const char *filename)
  */
 int beargit_rm(const char *filename)
 {
-  FILE *findex = fopen(".beargit/.index", "r");
+  FILE *findex = fopen(INDEX_PATH, "r");
   FILE *fnewindex = fopen(".beargit/.newindex", "w");
   int found = 0;
 
@@ -131,7 +131,7 @@ int beargit_rm(const char *filename)
   fclose(findex);
   fclose(fnewindex);
 
-  fs_mv(".beargit/.newindex", ".beargit/.index");
+  fs_mv(".beargit/.newindex", INDEX_PATH);
 
   return 0;
 }
@@ -195,19 +195,14 @@ int beargit_commit_hw1(const char *msg)
   read_string_from_file(PREV_PATH, commit_id, COMMIT_ID_SIZE);
   next_commit_id(commit_id);
 
-  char path[250];
-  strcpy(path, ".beargit/");
-  strcat(path, commit_id);
+  char path[FILENAME_SIZE + FILENAME_SIZE];
+  sprintf(path, ".beargit/%s", commit_id);
   fs_mkdir(path); // create .beargit/<commit_id> dir
 
-  strcpy(path, ".beargit/");
-  strcat(path, commit_id);
-  strcat(path, "/.index");
+  sprintf(path, ".beargit/%s/.index", commit_id);
   fs_cp(INDEX_PATH, path); // copy .beargit/.index into .beargit/<commit_id>
 
-  strcpy(path, ".beargit/");
-  strcat(path, commit_id);
-  strcat(path, "/.prev");
+  sprintf(path, ".beargit/%s/.prev", commit_id);
   fs_cp(PREV_PATH, path); // copy .beargit/.prev into .beargit/<commit_id>
 
   FILE *fp = fopen(INDEX_PATH, "r");
@@ -216,18 +211,13 @@ int beargit_commit_hw1(const char *msg)
   {
     strtok(line, "\n");
 
-    strcpy(path, ".beargit/");
-    strcat(path, commit_id);
-    strcat(path, "/");
-    strcat(path, line);
+    sprintf(path, ".beargit/%s/%s", commit_id, line);
     fs_cp(line, path); // copying tracked files into .beargit/<commit_id>
   }
 
   fclose(fp);
 
-  strcpy(path, ".beargit/");
-  strcat(path, commit_id);
-  strcat(path, "/.msg");
+  sprintf(path, ".beargit/%s/.msg", commit_id);
   write_string_to_file(path, msg);
 
   write_string_to_file(PREV_PATH, commit_id);
@@ -283,17 +273,13 @@ int beargit_log()
   char path[250];
   while (commit_id[0] != '0')
   {
-    strcpy(path, ".beargit/");
-    strcat(path, commit_id);
-    strcat(path, "/.msg");
+    sprintf(path, ".beargit/%s/.msg", commit_id);
     read_string_from_file(path, commit_msg, 100);
 
     printf("\ncommit %s\n", commit_id);
     printf("    %s\n", commit_msg);
 
-    strcpy(path, ".beargit/");
-    strcat(path, commit_id);
-    strcat(path, "/.prev");
+    sprintf(path, ".beargit/%s/.prev", commit_id);
     read_string_from_file(path, commit_id, COMMIT_ID_SIZE);
   }
 
@@ -349,7 +335,7 @@ void next_commit_id(char *commit_id)
 // returns -1 if the branch does not exist.
 int get_branch_number(const char *branch_name)
 {
-  FILE *fbranches = fopen(".beargit/.branches", "r");
+  FILE *fbranches = fopen(BRANCHES_PATH, "r");
 
   int branch_index = -1;
   int counter = 0;
@@ -478,7 +464,7 @@ int beargit_checkout(const char *arg, int new_branch)
   {
     char current_branch_file[BRANCHNAME_SIZE + 50];
     sprintf(current_branch_file, ".beargit/.branch_%s", current_branch);
-    fs_cp(".beargit/.prev", current_branch_file);
+    fs_cp(PREV_PATH, current_branch_file);
   }
 
   // Check whether the argument is a commit ID. If yes, we just stay in detached mode
@@ -524,10 +510,10 @@ int beargit_checkout(const char *arg, int new_branch)
   // Update the branch file if new branch is created (now it can't go wrong anymore)
   if (new_branch)
   {
-    FILE *fbranches = fopen(".beargit/.branches", "a");
+    FILE *fbranches = fopen(BRANCHES_PATH, "a");
     fprintf(fbranches, "%s\n", branch_name);
     fclose(fbranches);
-    fs_cp(".beargit/.prev", branch_file);
+    fs_cp(PREV_PATH, branch_file);
   }
 
   write_string_to_file(CURRENT_BRANCH_PATH, branch_name);
