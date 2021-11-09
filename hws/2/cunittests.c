@@ -43,7 +43,7 @@ int are_files_equal(char *filename1, char *filename2)
    fp1 = fopen(filename1, "r");
    fp2 = fopen(filename2, "r");
 
-   while (line1 != NULL && line2 != NULL)
+   while (1)
    {
       lp1 = fgets(line1, line_size, fp1);
       lp2 = fgets(line2, line_size, fp2);
