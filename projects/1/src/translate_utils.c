@@ -68,13 +68,23 @@ int is_valid_label(const char *str)
 int translate_num(long int *output, const char *str, long int lower_bound,
                   long int upper_bound)
 {
+    long res;
+    char *pEnd;
+
     if (!str || !output)
     {
         return -1;
     }
-    /* YOUR CODE HERE */
 
-    return -1;
+    res = strtol(str, &pEnd, 0);
+    if (!res || *pEnd != NULL || (res < lower_bound || res > upper_bound))
+    {
+        return -1;
+    }
+
+    *output = res;
+
+    return 0;
 }
 
 /* Translates the register name to the corresponding register number. Please
