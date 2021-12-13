@@ -10,14 +10,15 @@
 
 const int MAX_ARGS = 3;
 const int BUF_SIZE = 1024;
-const char* IGNORE_CHARS = " \f\n\r\t\v,()";
+const char *IGNORE_CHARS = " \f\n\r\t\v,()";
 
 /*******************************
  * Helper Functions
  *******************************/
 
 /* You should not be calling this function yourself. */
-static void raise_label_error(uint32_t input_line, const char* label) {
+static void raise_label_error(uint32_t input_line, const char *label)
+{
     write_to_log("Error - invalid label at line %d: %s\n", input_line, label);
 }
 
@@ -29,7 +30,8 @@ static void raise_label_error(uint32_t input_line, const char* label) {
 
    EXTRA_ARG should contain the first extra argument encountered.
  */
-static void raise_extra_arg_error(uint32_t input_line, const char* extra_arg) {
+static void raise_extra_arg_error(uint32_t input_line, const char *extra_arg)
+{
     write_to_log("Error - extra argument at line %d: %s\n", input_line, extra_arg);
 }
 
@@ -39,17 +41,20 @@ static void raise_extra_arg_error(uint32_t input_line, const char* extra_arg) {
    INPUT_LINE is which line of the input file that the error occurred in. Note
    that the first line is line 1 and that empty lines are included in the count.
  */
-static void raise_inst_error(uint32_t input_line, const char* name, char** args,
-    int num_args) {
-    
+static void raise_inst_error(uint32_t input_line, const char *name, char **args,
+                             int num_args)
+{
+
     write_to_log("Error - invalid instruction at line %d: ", input_line);
     log_inst(name, args, num_args);
 }
 
 /* Truncates the string at the first occurrence of the '#' character. */
-static void skip_comment(char* str) {
-    char* comment_start = strchr(str, '#');
-    if (comment_start) {
+static void skip_comment(char *str)
+{
+    char *comment_start = strchr(str, '#');
+    if (comment_start)
+    {
         *comment_start = '\0';
     }
 }
@@ -70,23 +75,33 @@ static void skip_comment(char* str) {
     3b. STR ends in ':' and is a valid label. Addition to symbol table succeeds.
         Returns 1.
  */
-static int add_if_label(uint32_t input_line, char* str, uint32_t byte_offset,
-    SymbolTable* symtbl) {
-    
+static int add_if_label(uint32_t input_line, char *str, uint32_t byte_offset,
+                        SymbolTable *symtbl)
+{
+
     size_t len = strlen(str);
-    if (str[len - 1] == ':') {
+    if (str[len - 1] == ':')
+    {
         str[len - 1] = '\0';
-        if (is_valid_label(str)) {
-            if (add_to_table(symtbl, str, byte_offset) == 0) {
+        if (is_valid_label(str))
+        {
+            if (add_to_table(symtbl, str, byte_offset) == 0)
+            {
                 return 1;
-            } else {
+            }
+            else
+            {
                 return -1;
             }
-        } else {
+        }
+        else
+        {
             raise_label_error(input_line, str);
             return -1;
         }
-    } else {
+    }
+    else
+    {
         return 0;
     }
 }
@@ -119,7 +134,8 @@ static int add_if_label(uint32_t input_line, char* str, uint32_t byte_offset,
    exit, but process the entire file and return -1. If no errors were encountered, 
    it should return 0.
  */
-int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
+int pass_one(FILE *input, FILE *output, SymbolTable *symtbl)
+{
     /* YOUR CODE HERE */
     return -1;
 }
@@ -133,7 +149,8 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
 
    If an error is reached, DO NOT EXIT the function. Keep translating the rest of
    the document, and at the end, return -1. Return 0 if no errors were encountered. */
-int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl) {
+int pass_two(FILE *input, FILE *output, SymbolTable *symtbl, SymbolTable *reltbl)
+{
     /* YOUR CODE HERE */
 
     // Since we pass this buffer to strtok(), the chars here will GET CLOBBERED.
@@ -148,12 +165,12 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
     // Parse for instruction arguments. You should use strtok() to tokenize
     // the rest of the line. Extra arguments should be filtered out in pass_one(),
     // so you don't need to worry about that here.
-    char* args[MAX_ARGS];
+    char *args[MAX_ARGS];
     int num_args = 0;
 
     // Use translate_inst() to translate the instruction and write to output file.
     // If an error occurs, the instruction will not be written and you should call
-    // raise_inst_error(). 
+    // raise_inst_error().
 
     // Repeat until no more characters are left, and the return the correct return val
 
@@ -164,16 +181,19 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
  * Do Not Modify Code Below
  *******************************/
 
-static int open_files(FILE** input, FILE** output, const char* input_name, 
-    const char* output_name) {
-    
+static int open_files(FILE **input, FILE **output, const char *input_name,
+                      const char *output_name)
+{
+
     *input = fopen(input_name, "r");
-    if (!*input) {
+    if (!*input)
+    {
         write_to_log("Error: unable to open input file: %s\n", input_name);
         return -1;
     }
     *output = fopen(output_name, "w");
-    if (!*output) {
+    if (!*output)
+    {
         write_to_log("Error: unable to open output file: %s\n", output_name);
         fclose(*input);
         return -1;
@@ -181,7 +201,8 @@ static int open_files(FILE** input, FILE** output, const char* input_name,
     return 0;
 }
 
-static void close_files(FILE* input, FILE* output) {
+static void close_files(FILE *input, FILE *output)
+{
     fclose(input);
     fclose(output);
 }
@@ -189,39 +210,46 @@ static void close_files(FILE* input, FILE* output) {
 /* Runs the two-pass assembler. Most of the actual work is done in pass_one()
    and pass_two().
  */
-int assemble(const char* in_name, const char* tmp_name, const char* out_name) {
+int assemble(const char *in_name, const char *tmp_name, const char *out_name)
+{
     FILE *src, *dst;
     int err = 0;
-    SymbolTable* symtbl = create_table(SYMTBL_UNIQUE_NAME);
-    SymbolTable* reltbl = create_table(SYMTBL_NON_UNIQUE);
+    SymbolTable *symtbl = create_table(SYMTBL_UNIQUE_NAME);
+    SymbolTable *reltbl = create_table(SYMTBL_NON_UNIQUE);
 
-    if (in_name) {
+    if (in_name)
+    {
         printf("Running pass one: %s -> %s\n", in_name, tmp_name);
-        if (open_files(&src, &dst, in_name, tmp_name) != 0) {
+        if (open_files(&src, &dst, in_name, tmp_name) != 0)
+        {
             free_table(symtbl);
             free_table(reltbl);
             exit(1);
         }
 
-        if (pass_one(src, dst, symtbl) != 0) {
+        if (pass_one(src, dst, symtbl) != 0)
+        {
             err = 1;
         }
         close_files(src, dst);
     }
 
-    if (out_name) {
+    if (out_name)
+    {
         printf("Running pass two: %s -> %s\n", tmp_name, out_name);
-        if (open_files(&src, &dst, tmp_name, out_name) != 0) {
+        if (open_files(&src, &dst, tmp_name, out_name) != 0)
+        {
             free_table(symtbl);
             free_table(reltbl);
             exit(1);
         }
 
         fprintf(dst, ".text\n");
-        if (pass_two(src, dst, symtbl, reltbl) != 0) {
+        if (pass_two(src, dst, symtbl, reltbl) != 0)
+        {
             err = 1;
         }
-        
+
         fprintf(dst, "\n.symbol\n");
         write_table(symtbl, dst);
 
@@ -230,13 +258,14 @@ int assemble(const char* in_name, const char* tmp_name, const char* out_name) {
 
         close_files(src, dst);
     }
-    
+
     free_table(symtbl);
     free_table(reltbl);
     return err;
 }
 
-static void print_usage_and_exit() {
+static void print_usage_and_exit()
+{
     printf("Usage:\n");
     printf("  Runs both passes: assembler <input file> <intermediate file> <output file>\n");
     printf("  Run pass #1:      assembler -p1 <input file> <intermediate file>\n");
@@ -245,50 +274,68 @@ static void print_usage_and_exit() {
     exit(0);
 }
 
-int main(int argc, char **argv) {
-    if (argc != 4 && argc != 6) {
+int main(int argc, char **argv)
+{
+    if (argc != 4 && argc != 6)
+    {
         print_usage_and_exit();
     }
 
     int mode = 0;
-    if (strcmp(argv[1], "-p1") == 0) {
+    if (strcmp(argv[1], "-p1") == 0)
+    {
         mode = 1;
-    } else if (strcmp(argv[1], "-p2") == 0) {
+    }
+    else if (strcmp(argv[1], "-p2") == 0)
+    {
         mode = 2;
     }
 
     char *input, *inter, *output;
-    if (mode == 1) {
+    if (mode == 1)
+    {
         input = argv[2];
         inter = argv[3];
         output = NULL;
-    } else if (mode == 2) {
+    }
+    else if (mode == 2)
+    {
         input = NULL;
         inter = argv[2];
         output = argv[3];
-    } else {
+    }
+    else
+    {
         input = argv[1];
         inter = argv[2];
         output = argv[3];
     }
 
-    if (argc == 6) {
-        if (strcmp(argv[4], "-log") == 0) {
+    if (argc == 6)
+    {
+        if (strcmp(argv[4], "-log") == 0)
+        {
             set_log_file(argv[5]);
-        } else {
+        }
+        else
+        {
             print_usage_and_exit();
         }
     }
 
     int err = assemble(input, inter, output);
 
-    if (err) {
+    if (err)
+    {
         write_to_log("One or more errors encountered during assembly operation.\n");
-    } else {
+    }
+    else
+    {
         write_to_log("Assembly operation completed successfully.\n");
     }
 
-    if (is_log_file_set()) {
+    if (is_log_file_set())
+    {
         printf("Results saved to %s\n", argv[5]);
     }
 

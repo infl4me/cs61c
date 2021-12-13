@@ -5,37 +5,49 @@
 
 #include "translate_utils.h"
 
-void write_inst_string(FILE* output, const char* name, char** args, int num_args) {
+void write_inst_string(FILE *output, const char *name, char **args, int num_args)
+{
     fprintf(output, "%s", name);
-    for (int i = 0; i < num_args; i++) {
+    for (int i = 0; i < num_args; i++)
+    {
         fprintf(output, " %s", args[i]);
     }
     fprintf(output, "\n");
 }
 
-void write_inst_hex(FILE *output, uint32_t instruction) {
+void write_inst_hex(FILE *output, uint32_t instruction)
+{
     fprintf(output, "%08x\n", instruction);
 }
 
-int is_valid_label(const char* str) {
-    if (!str) {
+int is_valid_label(const char *str)
+{
+    if (!str)
+    {
         return 0;
     }
 
     int first = 1;
-    while (*str) {
-        if (first) {
-            if (!isalpha((int) *str) && *str != '_') {
-                return 0;   // does not start with letter or underscore
-            } else {
+    while (*str)
+    {
+        if (first)
+        {
+            if (!isalpha((int)*str) && *str != '_')
+            {
+                return 0; // does not start with letter or underscore
+            }
+            else
+            {
                 first = 0;
             }
-        } else if (!isalnum((int) *str) && *str != '_') {
-            return 0;       // subsequent characters not alphanumeric
+        }
+        else if (!isalnum((int)*str) && *str != '_')
+        {
+            return 0; // subsequent characters not alphanumeric
         }
         str++;
     }
-    return first ? 0 : 1;   // empty string is invalid
+    return first ? 0 : 1; // empty string is invalid
 }
 
 /* Translate the input string into a signed number. The number is then 
@@ -53,9 +65,11 @@ int is_valid_label(const char* str) {
    function returns 0 if the conversion proceeded without errors, or -1 if an 
    error occurred.
  */
-int translate_num(long int* output, const char* str, long int lower_bound, 
-    long int upper_bound) {
-    if (!str || !output) {
+int translate_num(long int *output, const char *str, long int lower_bound,
+                  long int upper_bound)
+{
+    if (!str || !output)
+    {
         return -1;
     }
     /* YOUR CODE HERE */
@@ -68,12 +82,44 @@ int translate_num(long int* output, const char* str, long int lower_bound,
 
    Returns the register number of STR or -1 if the register name is invalid.
  */
-int translate_reg(const char* str) {
-    if (strcmp(str, "$zero") == 0)      return 0;
-    else if (strcmp(str, "$0") == 0)    return 0;
-    else if (strcmp(str, "$at") == 0)   return 1;
-    else if (strcmp(str, "$v0") == 0)   return 2;
-    else if (strcmp(str, "$a0") == 0)   return 4;
-    /* YOUR CODE HERE */
-    else                                return 0;
+int translate_reg(const char *str)
+{
+    if (strcmp(str, "$zero") == 0)
+        return 0;
+    else if (strcmp(str, "$0") == 0)
+        return 0;
+    else if (strcmp(str, "$at") == 0)
+        return 1;
+    else if (strcmp(str, "$v0") == 0)
+        return 2;
+    else if (strcmp(str, "$sp") == 0)
+        return 29;
+    else if (strcmp(str, "$ra") == 0)
+        return 31;
+    else if (strcmp(str, "$a0") == 0)
+        return 4;
+    else if (strcmp(str, "$a1") == 0)
+        return 5;
+    else if (strcmp(str, "$a2") == 0)
+        return 6;
+    else if (strcmp(str, "$a3") == 0)
+        return 7;
+    else if (strcmp(str, "$s0") == 0)
+        return 16;
+    else if (strcmp(str, "$s1") == 0)
+        return 17;
+    else if (strcmp(str, "$s2") == 0)
+        return 18;
+    else if (strcmp(str, "$s3") == 0)
+        return 19;
+    else if (strcmp(str, "$t0") == 0)
+        return 8;
+    else if (strcmp(str, "$t1") == 0)
+        return 9;
+    else if (strcmp(str, "$t2") == 0)
+        return 10;
+    else if (strcmp(str, "$t3") == 0)
+        return 11;
+    else
+        return -1;
 }

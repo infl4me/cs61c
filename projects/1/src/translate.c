@@ -38,14 +38,20 @@
 
    Returns the number of instructions written (so 0 if there were any errors).
  */
-unsigned write_pass_one(FILE* output, const char* name, char** args, int num_args) {
-    if (strcmp(name, "li") == 0) {
+unsigned write_pass_one(FILE *output, const char *name, char **args, int num_args)
+{
+    if (strcmp(name, "li") == 0)
+    {
         /* YOUR CODE HERE */
         return 0;
-    } else if (strcmp(name, "blt") == 0) {
+    }
+    else if (strcmp(name, "blt") == 0)
+    {
         /* YOUR CODE HERE */
         return 0;
-    } else {
+    }
+    else
+    {
         write_inst_string(output, name, args, num_args);
         return 1;
     }
@@ -71,15 +77,22 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
 
    Returns 0 on success and -1 on error. 
  */
-int translate_inst(FILE* output, const char* name, char** args, size_t num_args, uint32_t addr,
-    SymbolTable* symtbl, SymbolTable* reltbl) {
-    if (strcmp(name, "addu") == 0)       return write_rtype (0x21, output, args, num_args);
-    else if (strcmp(name, "or") == 0)    return write_rtype (0x25, output, args, num_args);
-    else if (strcmp(name, "slt") == 0)   return write_rtype (0x2a, output, args, num_args);
-    else if (strcmp(name, "sltu") == 0)  return write_rtype (0x2b, output, args, num_args);
-    else if (strcmp(name, "sll") == 0)   return write_shift (0x00, output, args, num_args);
+int translate_inst(FILE *output, const char *name, char **args, size_t num_args, uint32_t addr,
+                   SymbolTable *symtbl, SymbolTable *reltbl)
+{
+    if (strcmp(name, "addu") == 0)
+        return write_rtype(0x21, output, args, num_args);
+    else if (strcmp(name, "or") == 0)
+        return write_rtype(0x25, output, args, num_args);
+    else if (strcmp(name, "slt") == 0)
+        return write_rtype(0x2a, output, args, num_args);
+    else if (strcmp(name, "sltu") == 0)
+        return write_rtype(0x2b, output, args, num_args);
+    else if (strcmp(name, "sll") == 0)
+        return write_shift(0x00, output, args, num_args);
     /* YOUR CODE HERE */
-    else                                 return -1;
+    else
+        return -1;
 }
 
 /* A helper function for writing most R-type instructions. You should use
@@ -89,7 +102,8 @@ int translate_inst(FILE* output, const char* name, char** args, size_t num_args,
    This function is INCOMPLETE. Complete the implementation below. You will
    find bitwise operations to be the cleanest way to complete this function.
  */
-int write_rtype(uint8_t funct, FILE* output, char** args, size_t num_args) {
+int write_rtype(uint8_t funct, FILE *output, char **args, size_t num_args)
+{
     // Perhaps perform some error checking?
 
     int rd = translate_reg(args[0]);
@@ -108,8 +122,9 @@ int write_rtype(uint8_t funct, FILE* output, char** args, size_t num_args) {
    This function is INCOMPLETE. Complete the implementation below. You will
    find bitwise operations to be the cleanest way to complete this function.
  */
-int write_shift(uint8_t funct, FILE* output, char** args, size_t num_args) {
-	// Perhaps perform some error checking?
+int write_shift(uint8_t funct, FILE *output, char **args, size_t num_args)
+{
+    // Perhaps perform some error checking?
 
     long int shamt;
     int rd = translate_reg(args[0]);
