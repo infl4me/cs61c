@@ -6,6 +6,8 @@
 #include "translate_utils.h"
 #include "translate.h"
 
+const MAX16 = 0xFFFF;
+
 /* Writes instructions during the assembler's first pass to OUTPUT. The case
    for general instructions has already been completed, but you need to write
    code to translate the li and blt pseudoinstructions. Your pseudoinstruction 
@@ -88,11 +90,122 @@ int translate_inst(FILE *output, const char *name, char **args, size_t num_args,
         return write_rtype(0x2a, output, args, num_args);
     else if (strcmp(name, "sltu") == 0)
         return write_rtype(0x2b, output, args, num_args);
+
     else if (strcmp(name, "sll") == 0)
         return write_shift(0x00, output, args, num_args);
-    /* YOUR CODE HERE */
+    else if (strcmp(name, "jr") == 0)
+        return write_jr(0x08, output, args, num_args);
+    else if (strcmp(name, "addiu") == 0)
+        return write_imm(0x9, output, args, num_args);
+    else if (strcmp(name, "ori") == 0)
+        return write_imm(0xd, output, args, num_args);
+    else if (strcmp(name, "lui") == 0)
+        return write_lui(0xf, output, args, num_args);
+
+    else if (strcmp(name, "lb") == 0)
+        return write_mem(0x20, output, args, num_args);
+    else if (strcmp(name, "lbu") == 0)
+        return write_mem(0x24, output, args, num_args);
+    else if (strcmp(name, "lw") == 0)
+        return write_mem(0x23, output, args, num_args);
+    else if (strcmp(name, "sb") == 0)
+        return write_mem(0x28, output, args, num_args);
+    else if (strcmp(name, "sw") == 0)
+        return write_mem(0x2b, output, args, num_args);
+
+    else if (strcmp(name, "beq") == 0)
+        return write_branch(0x4, output, args, num_args, symtbl, reltbl);
+    else if (strcmp(name, "bne") == 0)
+        return write_branch(0x5, output, args, num_args, symtbl, reltbl);
+
+    else if (strcmp(name, "j") == 0)
+        return write_jump(0x2, output, args, num_args, symtbl, reltbl);
+    else if (strcmp(name, "jal") == 0)
+        return write_jump(0x3, output, args, num_args, symtbl, reltbl);
+
     else
         return -1;
+}
+
+int write_mem(uint8_t opcode, FILE *output, char **args, size_t num_args)
+{
+    long int number;
+    int rt = translate_reg(args[0]);
+    int rs = translate_reg(args[1]);
+    int err = translate_num(&number, args[2], 0, MAX16);
+
+    if (rs == -1 | rt == -1 | err == -1)
+    {
+        return -1;
+    }
+
+    uint32_t instruction = (opcode << 25) | (rs << 20) | (rt << 15) | (number << 0);
+    write_inst_hex(output, instruction);
+
+    return 0;
+}
+
+int write_branch(uint8_t opcode, FILE *output, char **args, size_t num_args,
+                 SymbolTable *symtbl, SymbolTable *reltbl)
+{
+    int rs = translate_reg(args[0]);
+    int rt = translate_reg(args[1]);
+
+    if (rs == -1 | rt == -1)
+    {
+        return -1;
+    }
+
+    int64_t addr = get_addr_for_symbol(symtbl, args[2]);
+
+    if (addr == -1)
+    {
+        addr = 0;
+        if (add_to_table(reltbl, args[2], 0) == -1)
+        {
+            return -1;
+        }
+    }
+
+    uint32_t instruction = (opcode << 25) | (rs << 20) | (rt << 15) | (addr << 0);
+    write_inst_hex(output, instruction);
+
+    return 0;
+}
+
+int write_jump(uint8_t opcode, FILE *output, char **args, size_t num_args,
+               SymbolTable *symtbl, SymbolTable *reltbl)
+{
+    int64_t addr = get_addr_for_symbol(symtbl, args[0]);
+
+    if (addr == -1)
+    {
+        addr = 0;
+        if (add_to_table(reltbl, args[0], 0) == -1)
+        {
+            return -1;
+        }
+    }
+
+    uint32_t instruction = (opcode << 25) | (addr << 0);
+    write_inst_hex(output, instruction);
+
+    return 0;
+}
+
+int write_jr(uint8_t funct, FILE *output, char **args, size_t num_args)
+{
+    int rs = translate_reg(args[0]);
+
+    if (rs == -1)
+    {
+        return -1;
+    }
+
+    uint32_t instruction = (0 << 25) | (rs << 20) | (0 << 15) | (0 << 10) | (0 << 5) | (funct << 0);
+    write_inst_hex(output, instruction);
+
+    return 0;
 }
 
 /* A helper function for writing most R-type instructions. You should use
@@ -104,14 +217,53 @@ int translate_inst(FILE *output, const char *name, char **args, size_t num_args,
  */
 int write_rtype(uint8_t funct, FILE *output, char **args, size_t num_args)
 {
-    // Perhaps perform some error checking?
-
     int rd = translate_reg(args[0]);
     int rs = translate_reg(args[1]);
     int rt = translate_reg(args[2]);
 
-    uint32_t instruction = 0;
+    if (rd == -1 | rs == -1 | rt == -1)
+    {
+        return -1;
+    }
+
+    uint32_t instruction = (0 << 25) | (rs << 20) | (rt << 15) | (rd << 10) | (0 << 5) | (funct << 0);
     write_inst_hex(output, instruction);
+
+    return 0;
+}
+
+int write_lui(uint8_t opcode, FILE *output, char **args, size_t num_args)
+{
+    long int number;
+    int rt = translate_reg(args[0]);
+    int err = translate_num(&number, args[1], 0, MAX16);
+
+    if (rt == -1 | err == -1)
+    {
+        return -1;
+    }
+
+    uint32_t instruction = (opcode << 25) | (0 << 20) | (rt << 15) | (number << 0);
+    write_inst_hex(output, instruction);
+
+    return 0;
+}
+
+int write_imm(uint8_t opcode, FILE *output, char **args, size_t num_args)
+{
+    long int number;
+    int rt = translate_reg(args[0]);
+    int rs = translate_reg(args[1]);
+    int err = translate_num(&number, args[2], 0, MAX16);
+
+    if (rs == -1 | rt == -1 | err == -1)
+    {
+        return -1;
+    }
+
+    uint32_t instruction = (opcode << 25) | (rs << 20) | (rt << 15) | (number << 0);
+    write_inst_hex(output, instruction);
+
     return 0;
 }
 
@@ -124,14 +276,18 @@ int write_rtype(uint8_t funct, FILE *output, char **args, size_t num_args)
  */
 int write_shift(uint8_t funct, FILE *output, char **args, size_t num_args)
 {
-    // Perhaps perform some error checking?
-
     long int shamt;
     int rd = translate_reg(args[0]);
     int rt = translate_reg(args[1]);
     int err = translate_num(&shamt, args[2], 0, 31);
 
-    uint32_t instruction = 0;
+    if (rd == -1 | rt == -1 | err == -1)
+    {
+        return -1;
+    }
+
+    uint32_t instruction = (0 << 25) | (0 << 20) | (rt << 15) | (rd << 10) | (shamt << 5) | (funct << 0);
     write_inst_hex(output, instruction);
+
     return 0;
 }

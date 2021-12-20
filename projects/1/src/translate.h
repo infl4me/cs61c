@@ -20,18 +20,16 @@ int write_shift(uint8_t funct, FILE* output, char** args, size_t num_args);
 
 int write_jr(uint8_t funct, FILE* output, char** args, size_t num_args);
 
-int write_addiu(uint8_t opcode, FILE* output, char** args, size_t num_args);
-
-int write_ori(uint8_t opcode, FILE* output, char** args, size_t num_args);
+int write_imm(uint8_t opcode, FILE* output, char** args, size_t num_args);
 
 int write_lui(uint8_t opcode, FILE* output, char** args, size_t num_args);
 
 int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args);
 
 int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args, 
-    uint32_t addr, SymbolTable* symtbl);
+    SymbolTable* symtbl, SymbolTable* reltbl);
 
 int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args, 
-    uint32_t addr, SymbolTable* reltbl);
+    SymbolTable* symtbl, SymbolTable* reltbl);
 
 #endif
