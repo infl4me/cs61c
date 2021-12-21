@@ -6,8 +6,6 @@
 #include "translate_utils.h"
 #include "translate.h"
 
-const MAX16 = 0xFFFF;
-
 /* Writes instructions during the assembler's first pass to OUTPUT. The case
    for general instructions has already been completed, but you need to write
    code to translate the li and blt pseudoinstructions. Your pseudoinstruction 
@@ -44,13 +42,64 @@ unsigned write_pass_one(FILE *output, const char *name, char **args, int num_arg
 {
     if (strcmp(name, "li") == 0)
     {
-        /* YOUR CODE HERE */
-        return 0;
+        if (num_args != 2)
+        {
+            return 0;
+        }
+
+        long int number;
+        int rt = translate_reg(args[0]);
+        int err = translate_num(&number, args[1], INT32_MIN, INT32_MAX);
+
+        if (err == -1)
+        {
+            return 0;
+        }
+
+        char newArgs[3];
+
+        if (number >= 0 && number <= UINT16_MAX)
+        {
+            newArgs[0] = "$0";
+            newArgs[1] = args[0];
+            newArgs[2] = args[1];
+
+            return write_pass_one(output, "addiu", newArgs, 3);
+        }
+
+        unsigned result = 0;
+
+        newArgs[0] = args[0];
+        newArgs[1] = number >> 16;
+
+        result += write_pass_one(output, "lui", newArgs, 2);
+
+        newArgs[0] = args[0];
+        newArgs[1] = args[1];
+        newArgs[2] = number & 0x0000FFFF;
+        return result + write_pass_one(output, "ori", newArgs, 3);
     }
     else if (strcmp(name, "blt") == 0)
     {
-        /* YOUR CODE HERE */
-        return 0;
+        if (num_args != 3)
+        {
+            return 0;
+        }
+
+        unsigned result = 0;
+
+        char newArgs[3];
+        newArgs[0] = "$at";
+        newArgs[1] = args[0];
+        newArgs[2] = args[1];
+        result += write_pass_one(output, "slt", newArgs, 3);
+
+        newArgs[0] = "$0";
+        newArgs[1] = "$at";
+        newArgs[2] = args[2];
+        result += write_pass_one(output, "bne", newArgs, 3);
+
+        return result;
     }
     else
     {
@@ -132,7 +181,7 @@ int write_mem(uint8_t opcode, FILE *output, char **args, size_t num_args)
     long int number;
     int rt = translate_reg(args[0]);
     int rs = translate_reg(args[1]);
-    int err = translate_num(&number, args[2], 0, MAX16);
+    int err = translate_num(&number, args[2], 0, UINT16_MAX);
 
     if (rs == -1 | rt == -1 | err == -1)
     {
@@ -236,7 +285,7 @@ int write_lui(uint8_t opcode, FILE *output, char **args, size_t num_args)
 {
     long int number;
     int rt = translate_reg(args[0]);
-    int err = translate_num(&number, args[1], 0, MAX16);
+    int err = translate_num(&number, args[1], 0, UINT16_MAX);
 
     if (rt == -1 | err == -1)
     {
@@ -254,7 +303,7 @@ int write_imm(uint8_t opcode, FILE *output, char **args, size_t num_args)
     long int number;
     int rt = translate_reg(args[0]);
     int rs = translate_reg(args[1]);
-    int err = translate_num(&number, args[2], 0, MAX16);
+    int err = translate_num(&number, args[2], 0, UINT16_MAX);
 
     if (rs == -1 | rt == -1 | err == -1)
     {
