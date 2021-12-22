@@ -136,8 +136,56 @@ static int add_if_label(uint32_t input_line, char *str, uint32_t byte_offset,
  */
 int pass_one(FILE *input, FILE *output, SymbolTable *symtbl)
 {
-    /* YOUR CODE HERE */
-    return -1;
+    char buf[BUF_SIZE];
+    size_t line_number = 1;
+    size_t byte_offset = 0;
+    int err = 0;
+
+    while (fgets(buf, sizeof(buf), input))
+    {
+        char *args[MAX_ARGS];
+        char *command;
+        int num_args = 0, label_status;
+        char *pch;
+        pch = strtok(buf, " ,()\n");
+
+        // label_status = add_if_label(line_number, pch, byte_offset, symtbl);
+
+        // if (label_status == -1)
+        // {
+        //     err = -1;
+        // }
+        // else if (label_status == 0)
+        // {
+        //     command = pch;
+        // }
+        // else if (label_status == 1)
+        // {
+        //     pch = strtok(NULL, ", \n");
+        //     command = pch;
+        // }
+        command = pch;
+        while (pch != NULL)
+        {
+            pch = strtok(NULL, " ,()\n");
+            if (pch)
+            {
+                args[num_args] = pch;
+                num_args++;
+            }
+        }
+
+        if (write_pass_one(output, command, args, num_args) == -1)
+        {
+            raise_inst_error(line_number, command, args, num_args);
+            err = -1;
+        }
+
+        line_number++;
+        byte_offset += 4;
+    }
+
+    return err;
 }
 
 /* Reads an intermediate file and translates it into machine code. You may assume:
@@ -177,10 +225,7 @@ int pass_two(FILE *input, FILE *output, SymbolTable *symtbl, SymbolTable *reltbl
         if (translate_inst(output, command, args, num_args, byte_offset, symtbl, reltbl) == -1)
         {
             raise_inst_error(line_number, command, args, num_args);
-            if (err == 0)
-            {
-                err = -1;
-            }
+            err = -1;
         }
 
         line_number++;
