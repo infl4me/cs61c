@@ -178,6 +178,11 @@ int translate_inst(FILE *output, const char *name, char **args, size_t num_args,
 
 int write_mem(uint8_t opcode, FILE *output, char **args, size_t num_args)
 {
+    if (num_args != 3)
+    {
+        return -1;
+    }
+
     long int number;
     int rt = translate_reg(args[0]);
     int err = translate_num(&number, args[1], INT16_MIN, INT16_MAX);
@@ -197,6 +202,11 @@ int write_mem(uint8_t opcode, FILE *output, char **args, size_t num_args)
 int write_branch(uint8_t opcode, FILE *output, char **args, size_t num_args,
                  uint32_t addr, SymbolTable *symtbl)
 {
+    if (num_args != 3)
+    {
+        return -1;
+    }
+
     int rs = translate_reg(args[0]);
     int rt = translate_reg(args[1]);
 
@@ -222,6 +232,11 @@ int write_branch(uint8_t opcode, FILE *output, char **args, size_t num_args,
 int write_jump(uint8_t opcode, FILE *output, char **args, size_t num_args,
                uint32_t addr, SymbolTable *reltbl)
 {
+    if (num_args != 1)
+    {
+        return -1;
+    }
+
     if (add_to_table(reltbl, args[0], addr) == -1)
     {
         return -1;
@@ -235,6 +250,11 @@ int write_jump(uint8_t opcode, FILE *output, char **args, size_t num_args,
 
 int write_jr(uint8_t funct, FILE *output, char **args, size_t num_args)
 {
+    if (num_args != 1)
+    {
+        return -1;
+    }
+
     int rs = translate_reg(args[0]);
 
     if (rs == -1)
@@ -257,6 +277,11 @@ int write_jr(uint8_t funct, FILE *output, char **args, size_t num_args)
  */
 int write_rtype(uint8_t funct, FILE *output, char **args, size_t num_args)
 {
+    if (num_args != 3)
+    {
+        return -1;
+    }
+
     int rd = translate_reg(args[0]);
     int rs = translate_reg(args[1]);
     int rt = translate_reg(args[2]);
@@ -274,6 +299,11 @@ int write_rtype(uint8_t funct, FILE *output, char **args, size_t num_args)
 
 int write_lui(uint8_t opcode, FILE *output, char **args, size_t num_args)
 {
+    if (num_args != 2)
+    {
+        return -1;
+    }
+
     long int number;
     int rt = translate_reg(args[0]);
     int err = translate_num(&number, args[1], 0, UINT16_MAX);
@@ -291,6 +321,11 @@ int write_lui(uint8_t opcode, FILE *output, char **args, size_t num_args)
 
 int write_imm(uint8_t opcode, FILE *output, char **args, size_t num_args)
 {
+    if (num_args != 3)
+    {
+        return -1;
+    }
+
     long int number;
     int rt = translate_reg(args[0]);
     int rs = translate_reg(args[1]);
@@ -316,6 +351,11 @@ int write_imm(uint8_t opcode, FILE *output, char **args, size_t num_args)
  */
 int write_shift(uint8_t funct, FILE *output, char **args, size_t num_args)
 {
+    if (num_args != 3)
+    {
+        return -1;
+    }
+
     long int shamt;
     int rd = translate_reg(args[0]);
     int rt = translate_reg(args[1]);

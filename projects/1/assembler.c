@@ -154,6 +154,7 @@ int pass_two(FILE *input, FILE *output, SymbolTable *symtbl, SymbolTable *reltbl
     char buf[BUF_SIZE];
     size_t line_number = 1;
     size_t byte_offset = 0;
+    int err = 0;
 
     while (fgets(buf, sizeof(buf), input))
     {
@@ -173,28 +174,20 @@ int pass_two(FILE *input, FILE *output, SymbolTable *symtbl, SymbolTable *reltbl
             }
         }
 
-        translate_inst(output, command, args, num_args, byte_offset, symtbl, reltbl);
+        if (translate_inst(output, command, args, num_args, byte_offset, symtbl, reltbl) == -1)
+        {
+            raise_inst_error(line_number, command, args, num_args);
+            if (err == 0)
+            {
+                err = -1;
+            }
+        }
 
         line_number++;
         byte_offset += 4;
     }
 
-    // First, read the next line into a buffer.
-
-    // Next, use strtok() to scan for next character. If there's nothing,
-    // go to the next line.
-
-    // Parse for instruction arguments. You should use strtok() to tokenize
-    // the rest of the line. Extra arguments should be filtered out in pass_one(),
-    // so you don't need to worry about that here.
-
-    // Use translate_inst() to translate the instruction and write to output file.
-    // If an error occurs, the instruction will not be written and you should call
-    // raise_inst_error().
-
-    // Repeat until no more characters are left, and the return the correct return val
-
-    return 0;
+    return err;
 }
 
 /*******************************
