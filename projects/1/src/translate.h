@@ -27,9 +27,9 @@ int write_lui(uint8_t opcode, FILE* output, char** args, size_t num_args);
 int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args);
 
 int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args, 
-    SymbolTable* symtbl, SymbolTable* reltbl);
+    uint32_t addr, SymbolTable* symtbl);
 
 int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args, 
-    SymbolTable* symtbl, SymbolTable* reltbl);
+    uint32_t addr, SymbolTable* reltbl);
 
 #endif

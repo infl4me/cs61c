@@ -151,11 +151,33 @@ int pass_one(FILE *input, FILE *output, SymbolTable *symtbl)
    the document, and at the end, return -1. Return 0 if no errors were encountered. */
 int pass_two(FILE *input, FILE *output, SymbolTable *symtbl, SymbolTable *reltbl)
 {
-    /* YOUR CODE HERE */
-
-    // Since we pass this buffer to strtok(), the chars here will GET CLOBBERED.
     char buf[BUF_SIZE];
-    // Store input line number / byte offset below. When should each be incremented?
+    size_t line_number = 1;
+    size_t byte_offset = 0;
+
+    while (fgets(buf, sizeof(buf), input))
+    {
+        char *args[MAX_ARGS];
+        char *command;
+        int num_args = 0;
+        char *pch;
+        pch = strtok(buf, " \n");
+        command = pch;
+        while (pch != NULL)
+        {
+            pch = strtok(NULL, " \n");
+            if (pch)
+            {
+                args[num_args] = pch;
+                num_args++;
+            }
+        }
+
+        translate_inst(output, command, args, num_args, byte_offset, symtbl, reltbl);
+
+        line_number++;
+        byte_offset += 4;
+    }
 
     // First, read the next line into a buffer.
 
@@ -165,8 +187,6 @@ int pass_two(FILE *input, FILE *output, SymbolTable *symtbl, SymbolTable *reltbl
     // Parse for instruction arguments. You should use strtok() to tokenize
     // the rest of the line. Extra arguments should be filtered out in pass_one(),
     // so you don't need to worry about that here.
-    char *args[MAX_ARGS];
-    int num_args = 0;
 
     // Use translate_inst() to translate the instruction and write to output file.
     // If an error occurs, the instruction will not be written and you should call
@@ -174,7 +194,7 @@ int pass_two(FILE *input, FILE *output, SymbolTable *symtbl, SymbolTable *reltbl
 
     // Repeat until no more characters are left, and the return the correct return val
 
-    return -1;
+    return 0;
 }
 
 /*******************************

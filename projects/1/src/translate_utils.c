@@ -77,7 +77,7 @@ int translate_num(long int *output, const char *str, long int lower_bound,
     }
 
     res = strtol(str, &pEnd, 0);
-    if (!res || *pEnd != NULL || (res < lower_bound || res > upper_bound))
+    if (*pEnd != NULL || (res < lower_bound || res > upper_bound))
     {
         return -1;
     }
