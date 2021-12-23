@@ -76,7 +76,7 @@ void test_translate_reg()
 
 void test_translate_num()
 {
-    long int output;
+    int output;
 
     CU_ASSERT_EQUAL(translate_num(&output, "35", -1000, 1000), 0);
     CU_ASSERT_EQUAL(output, 35);
@@ -89,6 +89,9 @@ void test_translate_num()
     CU_ASSERT_EQUAL(translate_num(&output, "72", -16, 71), -1);
     CU_ASSERT_EQUAL(translate_num(&output, "72", 72, 150), 0);
     CU_ASSERT_EQUAL(output, 72);
+    CU_ASSERT_EQUAL(translate_num(&output, "0xB0BACAFE", INT32_MIN, INT32_MAX), 0);
+    CU_ASSERT_EQUAL(output, 0xB0BACAFE);
+
     CU_ASSERT_EQUAL(translate_num(&output, "72", 73, 150), -1);
     CU_ASSERT_EQUAL(translate_num(&output, "35x", -100, 100), -1);
 }

@@ -47,7 +47,7 @@ unsigned write_pass_one(FILE *output, const char *name, char **args, int num_arg
             return 0;
         }
 
-        long int number;
+        int number;
         int rt = translate_reg(args[0]);
         int err = translate_num(&number, args[1], INT32_MIN, INT32_MAX);
 
@@ -56,28 +56,39 @@ unsigned write_pass_one(FILE *output, const char *name, char **args, int num_arg
             return 0;
         }
 
-        char newArgs[3];
-
-        if (number >= 0 && number <= UINT16_MAX)
+        if (number >= INT16_MIN && number <= INT16_MAX)
         {
-            newArgs[0] = "$0";
-            newArgs[1] = args[0];
+            char *newArgs[3];
+            newArgs[0] = args[0];
+            newArgs[1] = "$0";
             newArgs[2] = args[1];
 
             return write_pass_one(output, "addiu", newArgs, 3);
         }
 
-        unsigned result = 0;
+        char str_number[32];
+        char *newArgs[3];
+        unsigned unsigned_number = number;
+        newArgs[0] = "$at";
+        sprintf(str_number, "%d", unsigned_number >> 16);
+        newArgs[1] = str_number;
+
+        if (write_pass_one(output, "lui", newArgs, 2) == 0)
+        {
+            return 0;
+        }
 
         newArgs[0] = args[0];
-        newArgs[1] = number >> 16;
+        newArgs[1] = "$at";
+        sprintf(str_number, "%d", unsigned_number & 0x0000FFFF);
+        newArgs[2] = str_number;
 
-        result += write_pass_one(output, "lui", newArgs, 2);
+        if (write_pass_one(output, "ori", newArgs, 3) == 0)
+        {
+            return 1;
+        }
 
-        newArgs[0] = args[0];
-        newArgs[1] = args[1];
-        newArgs[2] = number & 0x0000FFFF;
-        return result + write_pass_one(output, "ori", newArgs, 3);
+        return 2;
     }
     else if (strcmp(name, "blt") == 0)
     {
@@ -86,20 +97,24 @@ unsigned write_pass_one(FILE *output, const char *name, char **args, int num_arg
             return 0;
         }
 
-        unsigned result = 0;
-
-        char newArgs[3];
+        char *newArgs[3];
         newArgs[0] = "$at";
         newArgs[1] = args[0];
         newArgs[2] = args[1];
-        result += write_pass_one(output, "slt", newArgs, 3);
+        if (write_pass_one(output, "slt", newArgs, 3) == 0)
+        {
+            return 0;
+        }
 
-        newArgs[0] = "$0";
-        newArgs[1] = "$at";
+        newArgs[0] = "$at";
+        newArgs[1] = "$0";
         newArgs[2] = args[2];
-        result += write_pass_one(output, "bne", newArgs, 3);
+        if (write_pass_one(output, "bne", newArgs, 3) == 0)
+        {
+            return 1;
+        }
 
-        return result;
+        return 2;
     }
     else
     {

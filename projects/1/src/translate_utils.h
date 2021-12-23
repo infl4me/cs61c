@@ -19,8 +19,8 @@ void write_inst_hex(FILE* output, uint32_t instruction);
 int is_valid_label(const char* str);
 
 /* IMPLEMENT ME - see documentation in translate_utils.c */
-int translate_num(long int* output, const char* str, long int lower_bound, 
-	long int upper_bound);
+int translate_num( int* output, const char* str,  int lower_bound, 
+	 int upper_bound);
 
 /* IMPLEMENT ME - see documentation in translate_utils.c */
 int translate_reg(const char* str);

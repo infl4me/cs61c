@@ -147,32 +147,62 @@ int pass_one(FILE *input, FILE *output, SymbolTable *symtbl)
         char *command;
         int num_args = 0, label_status;
         char *pch;
-        pch = strtok(buf, " ,()\n");
 
-        // label_status = add_if_label(line_number, pch, byte_offset, symtbl);
+        skip_comment(buf);
+        pch = strtok(buf, " ,()\n\t");
 
-        // if (label_status == -1)
-        // {
-        //     err = -1;
-        // }
-        // else if (label_status == 0)
-        // {
-        //     command = pch;
-        // }
-        // else if (label_status == 1)
-        // {
-        //     pch = strtok(NULL, ", \n");
-        //     command = pch;
-        // }
-        command = pch;
+        if (pch == NULL)
+        {
+            // line is empty. skip cycle
+            line_number++;
+            continue;
+        }
+
+        label_status = add_if_label(line_number, pch, byte_offset, symtbl);
+        if (label_status == -1 || label_status == 1)
+        {
+            if (label_status == -1)
+            {
+                err = -1;
+            }
+
+            pch = strtok(NULL, " ,()\n\t");
+            if (pch == NULL)
+            {
+                // line contains only label. go to next cycle
+                line_number++;
+                continue;
+            }
+
+            command = pch;
+        }
+        else if (label_status == 0)
+        {
+            command = pch;
+        }
+
         while (pch != NULL)
         {
-            pch = strtok(NULL, " ,()\n");
+            pch = strtok(NULL, " ,()\n\t");
             if (pch)
             {
+                if (num_args >= MAX_ARGS)
+                {
+                    num_args++;
+                    break;
+                }
+
                 args[num_args] = pch;
                 num_args++;
             }
+        }
+
+        if (num_args > MAX_ARGS)
+        {
+            raise_extra_arg_error(line_number, pch);
+            line_number++;
+            err = -1;
+            continue;
         }
 
         if (write_pass_one(output, command, args, num_args) == -1)
