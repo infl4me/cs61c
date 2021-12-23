@@ -150,7 +150,7 @@ int add_to_table(SymbolTable *table, const char *name, uint32_t addr)
 
     Symbol *symbol = table->tbl + table->len;
 
-    char *new_name = malloc(sizeof(char) * strlen(name));
+    char *new_name = malloc(sizeof(char) * strlen(name) + 1);
     if (new_name == NULL)
     {
         allocation_failed();
