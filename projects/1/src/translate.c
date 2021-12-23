@@ -198,7 +198,7 @@ int write_mem(uint8_t opcode, FILE *output, char **args, size_t num_args)
         return -1;
     }
 
-    long int number;
+    int number;
     int rt = translate_reg(args[0]);
     int err = translate_num(&number, args[1], INT16_MIN, INT16_MAX);
     int rs = translate_reg(args[2]);
@@ -238,7 +238,7 @@ int write_branch(uint8_t opcode, FILE *output, char **args, size_t num_args,
         return -1;
     }
 
-    uint32_t instruction = (opcode << 26) | (rs << 21) | (rt << 16) | (offset << 0);
+    uint32_t instruction = (opcode << 26) | (rs << 21) | (rt << 16) | ((offset & 0x0000FFFF) << 0);
     write_inst_hex(output, instruction);
 
     return 0;
@@ -319,7 +319,7 @@ int write_lui(uint8_t opcode, FILE *output, char **args, size_t num_args)
         return -1;
     }
 
-    long int number;
+    int number;
     int rt = translate_reg(args[0]);
     int err = translate_num(&number, args[1], 0, UINT16_MAX);
 
@@ -341,10 +341,10 @@ int write_imm(uint8_t opcode, FILE *output, char **args, size_t num_args)
         return -1;
     }
 
-    long int number;
+    int number;
     int rt = translate_reg(args[0]);
     int rs = translate_reg(args[1]);
-    int err = translate_num(&number, args[2], INT16_MIN, INT16_MAX);
+    int err = translate_num(&number, args[2], INT32_MIN, INT32_MAX);
 
     if (rs == -1 | rt == -1 | err == -1)
     {
@@ -371,7 +371,7 @@ int write_shift(uint8_t funct, FILE *output, char **args, size_t num_args)
         return -1;
     }
 
-    long int shamt;
+    int shamt;
     int rd = translate_reg(args[0]);
     int rt = translate_reg(args[1]);
     int err = translate_num(&shamt, args[2], 0, 31);

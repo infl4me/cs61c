@@ -202,17 +202,23 @@ int pass_one(FILE *input, FILE *output, SymbolTable *symtbl)
             raise_extra_arg_error(line_number, pch);
             line_number++;
             err = -1;
-            continue;
         }
-
-        if (write_pass_one(output, command, args, num_args) == -1)
+        else
         {
-            raise_inst_error(line_number, command, args, num_args);
-            err = -1;
+            int num_inst;
+            num_inst = write_pass_one(output, command, args, num_args);
+            if (num_inst == 0)
+            {
+                raise_inst_error(line_number, command, args, num_args);
+                err = -1;
+                line_number++;
+            }
+            else
+            {
+                line_number++;
+                byte_offset += num_inst * 4;
+            }
         }
-
-        line_number++;
-        byte_offset += 4;
     }
 
     return err;
