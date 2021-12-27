@@ -27,7 +27,27 @@ tab:	.asciiz "\t"
 # Returns: the length of the string
 #------------------------------------------------------------------------------
 strlen:
-	# YOUR CODE HERE
+	# backup
+	addiu $sp, $sp, -8
+	sw $s0, 0($sp)
+	sw $s1, 4($sp)
+
+	move $s0, $a0 # copy a0 to s0 so we don’t have to back it up
+	lbu $s1, 0($s0) # load character for first iteration
+Loop1:
+	beq $s1, $0, Ret1 # break out of loop if loaded character is null terminator
+	addiu $s0, $s0, 1 # increment pointer
+	lbu $s1, 0($s0) # load next character
+	j Loop1
+
+Ret1:
+	sub $v0, $s0, $a0
+	
+	# restore
+	lw $s1, 4($sp)
+	lw $s0, 0($sp)
+	addiu $sp, $sp, 8
+
 	jr $ra
 
 #------------------------------------------------------------------------------
@@ -41,7 +61,33 @@ strlen:
 # Returns: the destination array
 #------------------------------------------------------------------------------
 strncpy:
-	# YOUR CODE HERE
+	# backup
+	addiu $sp, $sp, -8
+	sw $s0, 0($sp)
+	sw $s1, 4($sp)
+
+	move $s0, $0
+	lbu $s1, 0($a1) # load character for first iteration
+Loop2:
+	beq $s1, $0, Ret2 # break out of loop if loaded character is null terminator
+	beq $s0, $a2, Ret2 # break out of loop if number of characters is reached
+	add $t0, $s0, $a0 # address of dest
+	sb $s1, 0($t0) # store char to dest
+	addiu $s0, $s0, 1 # increment index
+	add $t0, $s0, $a1 # address of src
+	lbu $s1, 0($t0) # load next character
+	j Loop2
+
+Ret2:
+	add $t0, $s0, $a0 # address of dest
+	sb $0, 0($t0) # store null terminator to dest
+	move $v0, $a0
+
+	# restore
+	lw $s1, 4($sp)
+	lw $s0, 0($sp)
+	addiu $sp, $sp, 8
+
 	jr $ra
 
 #------------------------------------------------------------------------------
@@ -57,7 +103,32 @@ strncpy:
 # Returns: pointer to the copy of the string
 #------------------------------------------------------------------------------
 copy_of_str:
-	# YOUR CODE HERE
+	# backup
+	addiu $sp, $sp, -12
+	sw $s0, 0($sp)
+	sw $s1, 4($sp)
+	sw $ra, 8($sp)
+
+	move $s0, $a0
+	jal strlen
+	move $s1, $v0 # backup strlen
+
+	move $a0, $v0 # strlen to a0
+	addi $a0, $a0, 1 # strlen + 1 (for null terminator)
+	li $v0, 9 # allocate space for new string
+	syscall
+
+	move $a0, $v0 # a0 = pointer to new space (dest)
+	move $a1, $s0 # a1 = pointer to source
+	move $a2, $s1 # a2 = strlen
+	jal strncpy
+
+	# restore	
+	lw $ra, 8($sp)
+	lw $s1, 4($sp)
+	lw $s0, 0($sp)
+	addiu $sp, $sp, 12
+
 	jr $ra
 
 ###############################################################################
