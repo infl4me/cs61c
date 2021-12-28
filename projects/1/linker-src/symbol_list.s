@@ -48,9 +48,44 @@
 # Returns:  address of symbol if found or -1 if not found
 #------------------------------------------------------------------------------
 addr_for_symbol:
-	# YOUR CODE HERE
+	# backup
+	addiu $sp, $sp, -12
+	sw $s0, 0($sp)
+	sw $s1, 4($sp)
+	sw $ra, 8($sp)
+
+	beq $a0, $0 not_found1
+	move $s0, $a0
+	move $s1, $a1
+	lw $a0, 4($a0)
+	move $a1, $a1
+	jal streq
+	beq $v0, $0 found1
+	lw $a0, 8($s0)
+	move $a1, $s1
+	jal addr_for_symbol
+	# restore
+	lw $ra, 8($sp)
+	lw $s1, 4($sp)
+	lw $s0, 0($sp)
+	addiu $sp, $sp, 12
 	jr $ra
-	
+
+not_found1:
+	li $v0, -1
+	lw $ra, 8($sp)
+	lw $s1, 4($sp)
+	lw $s0, 0($sp)
+	addiu $sp, $sp, 12
+	jr $ra
+found1:
+	lw $v0, 0($s0)
+	lw $ra, 8($sp)
+	lw $s1, 4($sp)
+	lw $s0, 0($sp)
+	addiu $sp, $sp, 12
+	jr $ra
+
 #------------------------------------------------------------------------------
 # function add_to_list()
 #------------------------------------------------------------------------------
@@ -69,8 +104,35 @@ addr_for_symbol:
 #
 # Returns: the new list
 #------------------------------------------------------------------------------
-add_to_list:	
-	# YOUR CODE HERE
+add_to_list:
+	# backup
+	addiu $sp, $sp, -20
+	sw $a0, 0($sp)
+	sw $a1, 4($sp)
+	sw $a2, 8($sp)
+	sw $s0, 12($sp)
+	sw $ra, 16($sp)
+
+	jal new_node
+	move $s0, $v0
+	lw $t0, 4($sp)
+	sw $t0, 0($s0) # node->addr = addr
+	lw $a0, 8($sp)
+	jal copy_of_str
+	sw $v0, 4($s0) # node->name = str_pointer
+	lw $t0, 0($sp)
+	sw $t0, 8($s0) # node->next = next
+
+	move $v0, $s0 # return new node pointer
+
+	# restore
+	lw $ra, 16($sp)
+	lw $s0, 12($sp)
+	lw $a2, 8($sp)
+	lw $a1, 4($sp)
+	lw $a0, 0($sp)
+	addiu $sp, $sp, 20
+
 	jr $ra
 
 ###############################################################################
