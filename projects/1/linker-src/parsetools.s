@@ -10,6 +10,37 @@
 
 .text	
 
+hex_chunk_to_char:
+	# backup
+	addiu $sp, $sp, -12
+	sw $s0, 0($sp)
+	sw $s1, 4($sp)
+	sw $s2, 8($sp)
+
+	srlv $t0, $a0, $a2
+	andi $s0, $t0, 0xF
+	li $t0, 10
+	bge $s0, $t0, L1
+	li $s1, 48
+	j L2
+L1:
+	li $s1, 87
+L2:
+	addu $s2, $s0, $s1 # s2 = char
+	srl $t0, $a2, 2
+	li $t1, 7
+	sub $t0, $t1, $t0 # t0 = buf index
+	add $t0, $t0, $a1 # t0 = new address
+	sb $s2, 0($t0)
+
+	# restore	
+	lw $s2, 8($sp)
+	lw $s1, 4($sp)
+	lw $s0, 0($sp)
+	addiu $sp, $sp, 12
+
+	jr $ra
+
 #------------------------------------------------------------------------------
 # function hex_to_str()
 #------------------------------------------------------------------------------
@@ -36,7 +67,34 @@
 # Returns: none
 #------------------------------------------------------------------------------
 hex_to_str:
-	# YOUR CODE HERE
+	# backup
+	addiu $sp, $sp, -4
+	sw $ra, 0($sp)
+
+	li $a2, 28
+	jal hex_chunk_to_char
+	li $a2, 24
+	jal hex_chunk_to_char
+	li $a2, 20
+	jal hex_chunk_to_char
+	li $a2, 16
+	jal hex_chunk_to_char
+	li $a2, 12
+	jal hex_chunk_to_char
+	li $a2, 8
+	jal hex_chunk_to_char
+	li $a2, 4
+	jal hex_chunk_to_char
+	li $a2, 0
+	jal hex_chunk_to_char
+	li $t0, 10
+	sb $t0, 8($a1)
+	sb $0, 9($a1)
+
+	# restore	
+	lw $ra, 0($sp)
+	addiu $sp, $sp, 4
+
 	jr $ra
 
 ###############################################################################
