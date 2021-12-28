@@ -45,7 +45,17 @@ relocLabel: .asciiz ".relocation"
 # Returns: 1 if the instruction needs relocation, 0 otherwise.
 #------------------------------------------------------------------------------
 inst_needs_relocation:
-	# YOUR CODE HERE
+	srl $t0, $a0, 26
+	li $t1, 2
+	beq $t0, $t1 reloc_needed
+	li $t1, 3
+	beq $t0, $t1 reloc_needed
+	move $v0, $0
+	j exit
+reloc_needed:
+	li $v0, 1
+
+exit:
 	jr $ra
 	
 #------------------------------------------------------------------------------
