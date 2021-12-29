@@ -105,7 +105,7 @@ relocate_inst:
 	# prepare relocated instr; works on Jump instructions only
 	li $t0, 0xFC000000 # prepare mask
 	and $t0, $s0, $t0 # reset 26 low bits of original instruction
-	srl $t1, $v0, 2 # divide received addr by 2
+	srl $t1, $v0, 2 # divide received addr by 4
 	or $v0, $t0, $t1 # concatenate op code with addr
 
 	# restore	
