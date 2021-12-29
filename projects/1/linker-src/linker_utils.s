@@ -77,7 +77,58 @@ exit:
 # Returns: the relocated instruction, or -1 if error
 #------------------------------------------------------------------------------
 relocate_inst:
-	# YOUR CODE HERE
+	# backup
+	addiu $sp, $sp, -20
+	sw $s0, 0($sp)
+	sw $s1, 4($sp)
+	sw $s2, 8($sp)
+	sw $s3, 12($sp)
+	sw $ra, 16($sp)
+
+	move $s0, $a0
+	move $s1, $a1
+	move $s2, $a2
+	move $s3, $a3
+
+	move $a0, $s3
+	move $a1, $s1
+	jal symbol_for_addr
+	li $t0, -1
+	beq $v0, $t0, error
+
+	move $a0, $s2
+	move $a1, $v0
+	jal addr_for_symbol
+	li $t0, -1
+	beq $v0, $t0, error
+
+	# prepare relocated instr; works on Jump instructions only
+	li $t0, 0xFC000000 # prepare mask
+	and $t0, $s0, $t0 # reset 26 low bits of original instruction
+	srl $t1, $v0, 2 # divide received addr by 2
+	or $v0, $t0, $t1 # concatenate op code with addr
+
+	# restore	
+	lw $ra, 16($sp)
+	lw $s3, 12($sp)
+	lw $s2, 8($sp)
+	lw $s1, 4($sp)
+	lw $s0, 0($sp)
+	addiu $sp, $sp, 20
+
+	jr $ra
+
+error:
+	li $v0, -1
+
+	# restore	
+	lw $ra, 16($sp)
+	lw $s3, 12($sp)
+	lw $s2, 8($sp)
+	lw $s1, 4($sp)
+	lw $s0, 0($sp)
+	addiu $sp, $sp, 20
+
 	jr $ra
 
 ###############################################################################
