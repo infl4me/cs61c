@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 
 """
 assembler.py: rather primitive two-pass assembler. Get the labels, then
