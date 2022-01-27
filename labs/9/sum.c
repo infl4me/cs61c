@@ -55,7 +55,26 @@ static int sum_unrolled(int n, int *a)
 
 static int sum_vectorized(int n, int *a)
 {
-	// WRITE YOUR VECTORIZED CODE HERE
+	__m128i s = _mm_setzero_si128();
+	int i = 0, aligned_n = n / 4 * 4;
+
+	for (i = 0; i < aligned_n; i += 4)
+	{
+		s = _mm_add_epi32(s, _mm_loadu_si128((__m128i *)(a + i)));
+	}
+
+	int a_res[4] = {0, 0, 0, 0};
+	_mm_storeu_si128((__m128i *)a_res, s);
+
+	int res = a_res[0] + a_res[1] + a_res[2] + a_res[3];
+
+	// tail case
+	for (i = aligned_n; i < n; i++)
+	{
+		res += a[i];
+	}
+
+	return res;
 }
 
 static int sum_vectorized_unrolled(int n, int *a)
@@ -89,7 +108,7 @@ void benchmark(int n, int *a, int (*computeSum)(int, int *), char *name)
 
 int main(int argc, char **argv)
 {
-	const int n = 7777;
+	const int n = 77777;
 
 	// initialize the array with random values
 	srand48(time(NULL));
