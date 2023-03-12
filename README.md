@@ -1,7 +1,7 @@
-CS 61c Solutions Repository
+CS 61C Solutions Repository
 =======================
 
-Current repository contains my solutions of Berkley's [Computer Science 61c — machine structures course](https://hkn.eecs.berkeley.edu/courseguides/CS/61C). Assigments: [link](https://inst.eecs.berkeley.edu//~cs61c/sp15/)
+Current repository contains my solutions of Berkeley's [Computer Science 61c — machine structures course](https://hkn.eecs.berkeley.edu/courseguides/CS/61C). Assigments: [link](https://inst.eecs.berkeley.edu//~cs61c/sp15/)
 
 ## Overview:
 The course focuses on concepts that drive computing architecture. Students will explore the software-hardware connection starting with high-level software with C and low-level assembly language with MIPS, as well as explore circuit and processor design. Students will then look at modern developments, such as different levels of parallelisms in computer processors, distributed computing, and warehouse scale computers (WSCs). Lastly, students will be introduced to basic operating system concepts. (Note: In some versions of the course OS concepts are covered before distributed computing and WSCs.)
